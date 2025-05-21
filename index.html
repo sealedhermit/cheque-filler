@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cheque referenece tool v1.0 </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cheque Filler Tool</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,8 +43,8 @@
       overflow-x: auto;
     }
     .cheque-container img {
-      width: 100%;
-      max-width: 800px;
+      width: 850px;
+      max-width: 100%;
     }
     .overlay-text {
       position: absolute;
@@ -53,38 +54,42 @@
       white-space: nowrap;
     }
     #payee {
-      top: 90px;
-      left: 13%;
+      top: 102px;
+      left: 140px;
     }
     #amount-words {
-      top: 130px;
-      left: 13%;
-      max-width: 70%;
+      top: 140px;
+      left: 140px;
+      max-width: 600px;
     }
     #amount-fig {
-      top: 130px;
-      right: 8%;
+      top: 140px;
+      right: 105px;
     }
     #date {
-      top: 35px;
-      right: 8%;
+      top: 33px;
+      right: 102px;
     }
   </style>
 </head>
 <body>
-  <h2>Cheque Filler Tool</h2>
+  <h2>Cheque fill ref. tool v1.0</h2>
   <div class="form">
-    <label>Payee Name: <input type="text" id="input-payee"></label>
-    <label>Amount (in figures): <input type="number" id="input-amount"></label>
-    <label>Date (DD/MM/YYYY): <input type="text" id="input-date"></label>
+    <label>Payee Name: <input type="text" id="input-payee" /></label>
+    <label>Amount (in figures): <input type="number" id="input-amount" /></label>
+    <label>Date (DD/MM/YYYY): <input type="text" id="input-date" /></label>
     <button onclick="fillCheque()">Fill Cheque</button>
-  </div>  <div class="cheque-container">
+  </div>
+
+  <div class="cheque-container">
     <img src="57985-cheque-micr.jpg" alt="cheque" />
     <div class="overlay-text" id="payee"></div>
     <div class="overlay-text" id="amount-words"></div>
     <div class="overlay-text" id="amount-fig"></div>
     <div class="overlay-text" id="date"></div>
-  </div>  <script>
+  </div>
+
+  <script>
     function toWords(num) {
       const a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
       const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
@@ -99,7 +104,21 @@
       return convert(num) + " Rupees Only";
     }
 
-    function fillCheque() {
+    async function validateDateInput(inputDate) {
+      try {
+        const res = await fetch("https://worldtimeapi.org/api/timezone/Asia/Kolkata");
+        const data = await res.json();
+        const serverDate = new Date(data.datetime).toLocaleDateString("en-GB"); // DD/MM/YYYY
+
+        if (inputDate !== serverDate) {
+          alert(`Entered date (${inputDate}) does not match today's date (${serverDate}).`);
+        }
+      } catch (err) {
+        console.error("Failed to fetch server time", err);
+      }
+    }
+
+    async function fillCheque() {
       const payee = document.getElementById("input-payee").value;
       const amount = parseInt(document.getElementById("input-amount").value);
       const date = document.getElementById("input-date").value;
@@ -108,6 +127,9 @@
       document.getElementById("amount-fig").innerText = amount;
       document.getElementById("amount-words").innerText = isNaN(amount) ? "" : toWords(amount);
       document.getElementById("date").innerText = date;
+
+      await validateDateInput(date);
     }
-  </script></body>
+  </script>
+</body>
 </html>
