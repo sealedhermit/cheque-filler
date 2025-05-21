@@ -73,7 +73,7 @@
   </style>
 </head>
 <body>
-  <h2>Cheque fill ref. tool v2.0</h2>
+  <h2>Cheque fill ref. tool v1.0</h2>
   <div class="form">
     <label>Payee Name: <input type="text" id="input-payee" /></label>
     <label>Amount (in figures): <input type="number" id="input-amount" /></label>
@@ -91,48 +91,47 @@
 
   <script>
     function toWords(num) {
-      const a = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", 
-                 "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", 
-                 "Seventeen", "Eighteen", "Nineteen"];
-      const b = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+      const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+                    "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+                    "Seventeen", "Eighteen", "Nineteen"];
+      const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
-      function convert(n) {
-        if (n < 20) return a[n];
-        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
-        if (n < 1000) return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + convert(n % 100) : "");
-        if (n < 100000) return convert(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + convert(n % 1000) : "");
-        if (n < 10000000) return convert(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + convert(n % 100000) : "");
-        return convert(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + convert(n % 10000000) : "");
+      function numToWords(n) {
+        if (n < 20) return ones[n];
+        if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+        if (n < 1000) return ones[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + numToWords(n % 100) : "");
+        if (n < 100000) return numToWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + numToWords(n % 1000) : "");
+        if (n < 10000000) return numToWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + numToWords(n % 100000) : "");
+        return numToWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + numToWords(n % 10000000) : "");
       }
 
-      return convert(num) + " Rupees Only";
+      if (isNaN(num) || num <= 0) return "";
+      return "Rupees " + numToWords(num) + " Only";
     }
 
-    async function validateDateInput(inputDate) {
-      try {
-        const res = await fetch("https://worldtimeapi.org/api/timezone/Asia/Kolkata");
-        const data = await res.json();
-        const serverDate = new Date(data.datetime).toLocaleDateString("en-GB"); // DD/MM/YYYY
-
-        if (inputDate !== serverDate) {
-          alert(`Entered date (${inputDate}) does not match today's date (${serverDate}).`);
-        }
-      } catch (err) {
-        console.error("Failed to fetch server time", err);
-      }
+    function getTodayDate() {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
     }
 
-    async function fillCheque() {
-      const payee = document.getElementById("input-payee").value;
+    function fillCheque() {
+      const payee = document.getElementById("input-payee").value.trim();
       const amount = parseInt(document.getElementById("input-amount").value);
-      const date = document.getElementById("input-date").value;
+      const date = document.getElementById("input-date").value.trim();
+      const today = getTodayDate();
+
+      if (date !== today) {
+        const proceed = confirm(`Entered date (${date}) does not match today's date (${today}). Do you want to continue?`);
+        if (!proceed) return;
+      }
 
       document.getElementById("payee").innerText = payee;
-      document.getElementById("amount-fig").innerText = amount;
-      document.getElementById("amount-words").innerText = isNaN(amount) ? "" : toWords(amount);
+      document.getElementById("amount-fig").innerText = isNaN(amount) ? "" : amount;
+      document.getElementById("amount-words").innerText = toWords(amount);
       document.getElementById("date").innerText = date;
-
-      await validateDateInput(date);
     }
   </script>
 </body>
