@@ -36,44 +36,60 @@
     .form button:hover {
       background-color: #0056b3;
     }
+
     .cheque-container {
       position: relative;
-      display: flex;
-      justify-content: center;
-      overflow-x: auto;
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
     }
+
     .cheque-container img {
-      width: 850px;
-      max-width: 100%;
+      width: 100%;
+      height: auto;
+      display: block;
     }
+
     .overlay-text {
       position: absolute;
-      font-size: 14px;
+      font-size: 1.2vw;
       color: #000;
       font-weight: bold;
       white-space: nowrap;
+      pointer-events: none;
     }
+
+    /* Positioning based on 850px width reference */
     #payee {
-      top: 102px;
-      left: 140px;
+      top: 12%;
+      left: 16.5%;
     }
+
     #amount-words {
-      top: 140px;
-      left: 140px;
-      max-width: 600px;
+      top: 17%;
+      left: 16.5%;
+      max-width: 70%;
     }
+
     #amount-fig {
-      top: 140px;
-      right: 105px;
+      top: 17%;
+      right: 12%;
     }
+
     #date {
-      top: 33px;
-      right: 102px;
+      top: 4%;
+      right: 12%;
+    }
+
+    @media (max-width: 600px) {
+      .overlay-text {
+        font-size: 3vw;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Cheque fill ref. tool v3.0</h2>
+  <h2>Cheque fill ref. tool v4.0</h2>
   <div class="form">
     <label>Payee Name: <input type="text" id="input-payee" /></label>
     <label>Amount (in figures): <input type="number" id="input-amount" /></label>
